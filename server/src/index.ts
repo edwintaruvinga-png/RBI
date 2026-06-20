@@ -7,6 +7,7 @@ import authRoutes from './modules/auth/auth.routes.js';
 import countryRoutes from './modules/countries/country.routes.js';
 import companyRoutes from './modules/companies/company.routes.js';
 import reportRoutes from './modules/reports/report.routes.js';
+import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 const app = express();
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // 404 + centralised error handling (must be registered last).
 app.use(notFoundHandler);
