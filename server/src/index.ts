@@ -6,6 +6,7 @@ import { env } from './config/env.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import countryRoutes from './modules/countries/country.routes.js';
 import companyRoutes from './modules/companies/company.routes.js';
+import reportRoutes from './modules/reports/report.routes.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 const app = express();
@@ -26,6 +27,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/companies', companyRoutes);
+app.use('/api/reports', reportRoutes);
 
 // 404 + centralised error handling (must be registered last).
 app.use(notFoundHandler);
