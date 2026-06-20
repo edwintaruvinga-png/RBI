@@ -1,0 +1,132 @@
+// Prisma schema for the reinsurance market-intelligence app.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BROKER
+  ADMIN
+  VIEWER
+}
+
+enum CompanyType {
+  CEDANT
+  REINSURER
+  BROKER
+  MGA
+}
+
+enum MeetingType {
+  MEETING
+  CONFERENCE
+  CALL
+  SITE_VISIT
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(VIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  meetingReports MeetingReport[]
+
+  @@index([role])
+}
+
+model Country {
+  id                  String   @id @default(cuid())
+  name                String
+  code                String   @unique
+  regulatoryFramework String?  @db.Text
+  regulatorName       String?
+  regulatorWebsite    String?
+  regulatorEmail      String?
+  regulatorPhone      String?
+  regulatorAddress    String?  @db.Text
+  mandatoryCessions   Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  companies      Company[]
+  meetingReports MeetingReport[]
+  enrichments    Enrichment[]
+
+  @@index([name])
+}
+
+model Company {
+  id           String      @id @default(cuid())
+  name         String
+  countryId    String
+  type         CompanyType
+  amBestRating String?
+  website      String?
+  headquarters String?
+  notes        String?     @db.Text
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  country        Country         @relation(fields: [countryId], references: [id])
+  meetingReports MeetingReport[]
+  enrichments    Enrichment[]
+
+  @@index([countryId])
+  @@index([type])
+  @@index([name])
+}
+
+model MeetingReport {
+  id             String      @id @default(cuid())
+  type           MeetingType
+  countryId      String
+  companyId      String?
+  authorId       String
+  meetingDate    DateTime
+  location       String?
+  attendees      Json?
+  rawNotes       String?     @db.Text
+  summaryBullets Json?
+  actionItems    Json?
+  tags           Json?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  country Country  @relation(fields: [countryId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id])
+  author  User     @relation(fields: [authorId], references: [id])
+
+  @@index([countryId])
+  @@index([companyId])
+  @@index([authorId])
+  @@index([type])
+  @@index([meetingDate])
+}
+
+model Enrichment {
+  id        String   @id @default(cuid())
+  countryId String?
+  companyId String?
+  source    String
+  fetchedAt DateTime @default(now())
+  payload   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country Country? @relation(fields: [countryId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id])
+
+  @@index([countryId])
+  @@index([companyId])
+  @@index([source])
+}
