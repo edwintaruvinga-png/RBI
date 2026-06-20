@@ -1,6 +1,7 @@
 import type { ErrorRequestHandler, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import jwt from 'jsonwebtoken';
+import { Prisma } from '@prisma/client';
 import { env } from '../config/env.js';
 
 // jsonwebtoken is CommonJS; its error classes must come off the default export
@@ -42,6 +43,27 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof JsonWebTokenError) {
     res.status(401).json({ error: 'Unauthorized', message: 'Invalid token' });
     return;
+  }
+
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    switch (err.code) {
+      case 'P2002':
+        res.status(409).json({
+          error: 'Conflict',
+          message: 'A record with these unique field(s) already exists',
+          details: err.meta?.target,
+        });
+        return;
+      case 'P2025':
+        res.status(404).json({ error: 'NotFound', message: 'Record not found' });
+        return;
+      case 'P2003':
+        res.status(409).json({
+          error: 'Conflict',
+          message: 'Operation violates a foreign key constraint',
+        });
+        return;
+    }
   }
 
   if (err instanceof AppError) {
