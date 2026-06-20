@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useCountries } from '../api/hooks/useCountries';
 import { Card, ErrorState, PageHeader } from '../components/ui';
 import { Spinner } from '../components/Spinner';
@@ -34,7 +35,14 @@ export function CountriesPage() {
                 ) : (
                   countries.map((country) => (
                     <tr key={country.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-3 font-medium text-navy-900">{country.name}</td>
+                      <td className="px-5 py-3 font-medium">
+                        <Link
+                          to={`/countries/${country.id}`}
+                          className="text-navy-900 hover:text-navy-600 hover:underline"
+                        >
+                          {country.name}
+                        </Link>
+                      </td>
                       <td className="px-5 py-3 text-navy-500">{country.code}</td>
                       <td className="px-5 py-3 text-navy-500">{country.regulator.name ?? '—'}</td>
                       <td className="px-5 py-3">

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useCompanies } from '../api/hooks/useCompanies';
 import { Badge, Card, ErrorState, PageHeader } from '../components/ui';
 import { Spinner } from '../components/Spinner';
@@ -34,7 +35,14 @@ export function CompaniesPage() {
                 ) : (
                   companies.map((company) => (
                     <tr key={company.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-3 font-medium text-navy-900">{company.name}</td>
+                      <td className="px-5 py-3 font-medium">
+                        <Link
+                          to={`/companies/${company.id}`}
+                          className="text-navy-900 hover:text-navy-600 hover:underline"
+                        >
+                          {company.name}
+                        </Link>
+                      </td>
                       <td className="px-5 py-3">
                         <Badge>{company.type}</Badge>
                       </td>
